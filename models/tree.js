@@ -14,5 +14,9 @@ Tree.prototype.addNode = function(node,startingPoint) {
   this.nodes[node.name] = node;
 }
 
+Tree.prototype.connect = function(n1,n2,options) {
+  return this.nodes[n1].connect(this.nodes[n2],options);
+}
+
 
 module.exports = Tree;
