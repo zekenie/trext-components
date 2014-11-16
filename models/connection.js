@@ -35,8 +35,11 @@ Connection.prototype.contains =  function(input) {
   return input.toLowerCase().indexOf(this.case.toLowerCase()) !== -1
 }
 
-Connection.prototype.match = function(input) {
-  return this[this.comparator](input)
+Connection.prototype.match = function(input,cb) {
+  var self = this;
+  process.nextTick(function() {
+    cb(null, self[self.comparator](input))
+  })
 }
 
 

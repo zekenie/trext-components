@@ -1,3 +1,5 @@
+
+var async = require('async')
 var Connection = require('./connection')
 var _ = require('lodash')
 /*
@@ -12,6 +14,13 @@ var Node = function(config) {
   for(k in config) {
     this[k] = config[k]
   }
+}
+
+Node.prototype.getText = function(cb) {
+  var self = this;
+  process.nextTick(function() {
+    cb(null, self.text)
+  })
 }
 
 Node.prototype.optionsStr = function() {
@@ -31,20 +40,19 @@ Node.prototype.connect = function(otherNode,config) {
     config = defaultConf;
   }
 
-  // console.log(defaultConf)
-
-
   config = _.merge(defaultConf,config) || defaultConf;
 
   this.connections.push(new Connection(config));
 }
 
-Node.prototype.next = function(input) {
-  for(var i = 0; i < this.connections.length; i++) {
-    if(this.connections[i].match(input)) {
-      return this.connections[i].next;
-    }
-  }
+Node.prototype.next = function(input,cb) {
+  async.detect(this.connections,function(c,done) {
+    c.match(input, function(err, isMatch) {
+      done(isMatch);
+    })
+  }, function(connection) {
+    cb(null,connection.next);
+  });
 }
 
 module.exports = Node;
